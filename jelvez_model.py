@@ -8,7 +8,7 @@ from gurobipy import *
 
 try:
     # Criação de um novo modelo
-    m = Model("modeloexato")
+    m = Model("modelo jelvez")
 
     # Criação de Variaveis
     x = []
