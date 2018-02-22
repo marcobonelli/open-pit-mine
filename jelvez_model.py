@@ -3,77 +3,79 @@ import sys
 import math
 import random
 from gurobipy import *
-# Universidade Federal De Ouro Preto - Joao Monlevade - ICEA
-# Aluno: Matheus Correia Teixeira - 14.1.8375
 
-R = [1,2,3]
-B = [[1,2,3],[4,5,6],[7,8,9,10,11,12]]
-A = [(7,0),(7,1),(7,2),(7,5),(7,6),
-     (8,4),(8,5),(8,1),(8,2),(8,3),
-     (11,0),(11,1),(11,2),(11,3),(11,4),(11,5),(11,6),(11,9),(11,10)]
-K = [3,3,3,3,3,3,3,3,3,3,3,3]
-v = [[0,3,0],[0,3,2],[1,1,2,5,7,8]]
-p = 0.3
-a = [1,2,3,1,2,3,1,2,3,1,2,3]
-cUpperBound = [6,6,6,6,6,6,6,6,6,6,6,6]
-cLowerBound = [1,1,1,1,1,1,1,1,1,1,1,1]
+allB = [2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 14, 15, 16, 21, 22, 23, 28]
 
-try:
-    # Criação de um novo modelo
-    m = Model("modeloexato")
+R = [0, 1, 2]
 
-    # Criação de Variaveis
-    x = []
-    for j in range(len(R)):
-        for i in range(len(B[j])):
-            x.append(m.addVar(vtype = GRB.BINARY, name = "x"))
+B = [[] for i in range(len(R))]
+B[0] = [7, 8, 9, 14, 15, 16, 21, 22, 23, 28]
+B[1] = [5, 6, 13]
+B[2] = [2, 3, 4, 11]
 
-    y = []
-    for j in range(len(R)):
-        for i in range(len(B[j])):
-            y.append(m.addVar(vtype = GRB.BINARY, name = "y"))
+K = [0]
 
-    M = []
-    for i in range(len(R)):
-        M.append(m.addVar(vtype = GRB.BINARY, name = "M"))
+A = [[] for i in range(29)]
+A[2] = []
+A[3] = []
+A[4] = []
+A[5] = []
+A[6] = []
+A[7] = []
+A[8] = []
+A[9] = []
+A[11] = [2, 3, 4]
+A[13] = [5, 6, 7]
+A[14] = [7, 8]
+A[15] = [8, 9]
+A[16] = [9]
+A[21] = [14, 15]
+A[22] = [15, 16]
+A[23] = [22]
+A[28] = [21, 23]
 
-    # Integração das Variaveis
-    m.update()
+v = [0, 0, +2, -3, +1, +5, -2, -2, +4, -6, 0, +1, 0, +2, +3, +1, +4, 0, 0, 0, 0, +6, +1, +3, 0, 0, 0, 0, +1]
 
-    # Função Objetivo
-    m.setObjective(quicksum(p * v[r][i] * x[i] for r in range(len(R)) for i in range(len(B[r]))), GRB.MAXIMIZE)
+p = 0.15
 
-    # Criação das Restrições
+cLowerBound = [[] for i in range(len(K))]
+cLowerBound[0] = 5
 
-    # (2)
-    for r in range(len(R)):
-        for i in range(len(B[r])):
-            m.addConstr(x[i] <= y[r])
+cUpperBound = [[] for i in range(len(K))]
+cUpperBound[0] = 10
 
-    # (3)
-    for (i,j) in A:
-        m.addConstr(x[i] <= x[j])
+model = Model("Open_Pit_Mine_Production_Scheduling")
 
-    # (4)
-    for k in range(len(K)):
-        m.addConstr(quicksum(a[i] * x[i] for r in range(len(R)) for i in range(len(B[r]))) <= cUpperBound[k])
+x = model.addVars(allB, vtype = GRB.BINARY, name = 'x')
+y = model.addVars(R, vtype = GRB.BINARY, name = 'y')
+M = model.addVars(R, vtype = GRB.BINARY, name = 'M')
 
-    # (5)
-    for k in range(len(K)):
-        m.addConstr(quicksum(a[i] * x[i] for r in range(len(R)) for i in range(len(B[r]))) >= cLowerBound[k])
+model.update()
 
-    # (6)
-    m.addConstr(quicksum(y[r] for r in range(len(R))) <= 1 + quicksum(M[r] for r in range(len(R))))
+model.setObjective(quicksum(p * v[i] * x[i] for i in allB), GRB.MAXIMIZE)
 
-    # (7)
-    for r in range(len(R)):
-        m.addConstr(M[r] <= quicksum(x[i] for i in range(len(B[r]))) / len(B[r]))
+model.addConstrs((x[i] <= y[r] for r in R for i in B[r]), name = 'R2')
+model.addConstrs((x[i] <= x[j] for i in allB for j in A[i] if len(A[i]) != 0), name = 'R3')
+model.addConstrs((quicksum(x[i] for i in allB) >= cLowerBound[k] for k in K), name = 'R4') # falta adicionar o peso [a] do processo
+model.addConstrs((quicksum(x[i] for i in allB) <= cUpperBound[k] for k in K), name = 'R5') # falta adicionar o peso [a] do processo
+model.addConstr((quicksum(y[r1] for r1 in R) <= 1 + quicksum(M[r2] for r2 in R)), name = 'R6')
+model.addConstrs((M[r] <= quicksum(x[i] for i in B[r]) / len(B[r]) for r in R), name = 'R7')
 
-    m.optimize()
-    for v in m.getVars():
-        print v.varName, v.x
+model.write('jelvez.lp') 
+model.write('jelvez.mps') 
 
-    print 'Obj:', m.objVal
-    
-except GurobiError:
-    print 'Error reported'
+model.optimize()
+
+for i in allB:
+    if x[i].x == 1:
+        print("o bloco {} foi extraído".format(i))
+    else:
+        print("o bloco {} não foi extraído".format(i))
+
+print("")
+
+for r in R:
+    if y[r] .x == 1:
+        print("o bloco agregado {} foi explorado".format(r))
+    else:
+        print("o bloco agregado {} não foi explorado".format(r))
