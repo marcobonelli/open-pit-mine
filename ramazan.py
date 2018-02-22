@@ -103,37 +103,32 @@ C = [0 for i in range(len(linesB))]
 for line in range(0, len(C_aux)):
     C[line] = C_aux[line][1]
 
-# C = [0, 0, 0, 0, 3, 2, 1, 0, 0, 4, 0, 0, 5, 6, 0, 0, 7]
-C = [0, 0, 0, 0, 2, 1, 3, 0, 0, 4, 0, 0, 5, 6, 0, 0, 7]
+C = [0, 0, 0, 0, 3, 2, 1, 0, 0, 4, 0, 0, 5, 6, 0, 0, 7]
+# C = [0, 0, 0, 0, 2, 1, 3, 0, 0, 4, 0, 0, 5, 6, 0, 0, 7]
 
 E = float(0.0001) 
 
-while True:
+model = Model("Fundamental_Tree_Algorithm")
 
-    model = Model("Fundamental_Tree_Algorithm")
+f = model.addVars(posI, negI, vtype = GRB.CONTINUOUS, name = 'f')
 
-    f = model.addVars(posI, negI, vtype = GRB.CONTINUOUS, name = 'f')
+model.setObjective(quicksum(C[i] * f[i, j] for i in posI for j in NegP[i]), GRB.MINIMIZE)
 
-    model.setObjective(quicksum(C[i] * f[i, j] for i in posI for j in NegP[i]), GRB.MINIMIZE)
+model.update()
 
-    model.update()
+model.addConstrs((quicksum(f[i, j] for i in PosN[j]) == -V[j] + E for j in negI), name = 'negativo')
+model.addConstrs((quicksum(f[i, j] for j in NegP[i]) <= V[i] for i in posI), name = 'positivo')
 
-    model.addConstrs((quicksum(f[i, j] for i in PosN[j]) == -V[j] + E for j in negI), name = 'negativo')
-    model.addConstrs((quicksum(f[i, j] for j in NegP[i]) <= V[i] for i in posI), name = 'positivo')
+model.write('ramazan.lp') 
+model.write('ramazan.mps') 
 
-    model.write('ramazan.lp') 
-    model.write('ramazan.mps') 
+model.optimize()
 
-    model.optimize()
+print('Obj:', model.objVal)
 
-    print('Obj:', model.objVal)
+NegP_past = NegP
 
-    NegP_past = NegP
-
-    [NegP, PosN, C] = atualizacao(f)
-
-    if NegP_past == NegP:
-	break
+[NegP, PosN, C] = atualizacao(f)
 
 for i in posI:
     for j in NegP[i]:
