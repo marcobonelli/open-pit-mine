@@ -2,7 +2,8 @@
 import sys
 import math
 import random
-from numpy.random import standard_normal
+import numpy 
+from numpy.random import standard_normal, normal
 from numpy import array, zeros, sqrt, shape
 from pylab import *
 
@@ -73,38 +74,37 @@ def incertezasVizinhos():
                 if dataP[lineN][collumn] == line:
                     neighbors[line].append(dataP[lineN][0])
 
+    # for line in range(0, len(dataB)):
+    #     print(neighbors[line])
+
+    expected = []
+
     for line in range(0, len(dataB)):
-        for collumn in range(0, 4):
-            dataB[line][collumn] = int(dataB[line][collumn])
+        expected.append([])
+        for collumn in neighbors[line]:
+            expected[line].append(int(dataB[collumn][9]))
 
-        for collumn in range(5, 10):
-            dataB[line][collumn] = float(dataB[line][collumn])
+    # for line in range(0, len(dataB)):
+        # print("bloco {}: {}".format(line, expected[line]))
 
-        dataB[line][10] = int(dataB[line][10])
+    desvio = []
+    media = []
+    normaldistribution = []
+    for line in range(0, len(dataB)):
+        desvio.append(std(expected[line]))
+        media.append(mean(expected[line]))
+        if desvio[line] != 0:
+            normaldistribution.append(normal(media[line], desvio[line]))
+        else:
+            normaldistribution.append(media[line])
+        # print("bloco {}: {}".format(line, normaldistribution[line]))
 
-    blocks = dataB
-
-    aux = [0 for i in range(len(dataB))]
-
-    value = []
-    # print(neighbors[10])
-    for line in range(0, len(blocks)):
+    for line in range(0, len(dataP)):
         for collumn in range(0, len(dataP)):
-            if(dataP[line][1] == 0):
-                aux[line] = dataB[line][9]
-            else:
-                expected = 0
-                for block in neighbors[line]:
-                    expected += blocks[block][9]
-                expected /= len(neighbors[line])
-                aux[line] = expected 
+            if (int(dataP[line][1]) == 0):
+                normaldistribution[line] = int(dataB[line][9])
 
-    # print(aux)
-    return aux
-        # value.append([line, expected])
-
-    # for line in range(0, len(value)):
-    #     print(value[line])
+    return normaldistribution
 
 def Toneladas():
 
@@ -161,10 +161,12 @@ def Beneficio():
     tons = Toneladas()
     # print(vizinhos,preco,tons)
 
-    beneficiototal = [0 for i in range(len(vizinhos))]
+    # print(vizinhos)
 
-    for i in range(len(vizinhos)):
-        beneficiototal[i] = vizinhos[i]*preco*tons[i]
+    beneficiototal = [0 for i in range(len(tons))]
+
+    for i in range(len(tons)):
+        beneficiototal[i] = float(format(vizinhos[i]*preco*tons[i], '.2f'))
 
     # print(preco)
     print(beneficiototal)
