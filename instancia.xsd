@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<!-- root element -->
+<xs:element name="OPMS_instance"> 
+<xs:complexType>
+<xs:sequence>
+<xs:element ref="Incerteza"/>
+<xs:element ref="Simulador"/>
+<xs:element ref="Mina">
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+
+
+<!-- Parametros -->
+<xs:element name="Incerteza"> 
+<xs:complexType>
+<xs:sequence>
+<xs:element name="p0" type="xs:float"/>
+<xs:element name="precomedio" type="xs:float"/>
+<xs:element name="desviopreco" type="xs:float"/>
+<xs:element name="H" type="xs:float"/>
+<xs:element name="dt" type="xs:float"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+
+<!-- Parametros -->
+<xs:element name="Simulador"> 
+<xs:complexType>
+<xs:sequence>
+<xs:element name="replicacoes" type="xs:positiveInteger"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+
+<!-- Gerador -->
+<xs:element name="Mina"> 
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Arqblocos" type="xs:string"/>
+<xs:element name="Arqprec" type="xs:string"/>
+<xs:element name="Arqupit" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+
+</xs:schema>
+
+
