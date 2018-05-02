@@ -3,11 +3,13 @@ import TemplatePD as tpd
 import sys
 import math
 import random
-import numpy 
+import numpy
+import copy as c
 from numpy.random import standard_normal, normal
 from numpy import array, zeros, sqrt, shape
 from pylab import *
 from leitorXML import *
+
 class ProblemaOPM(tpd.Problema):
   # criar a classe problema
   # puxar dados do xml
@@ -112,6 +114,13 @@ class ProblemaOPM(tpd.Problema):
         DEVE SER SOBRESCRITO
     '''
     return 0 
+
+  def CriaEstado(self):
+
+  	vEstado = EstadoOPM([self.B,self.P,self.N,self.p0])
+
+  	return vEstado
+
 class GeraIncerteza(tpd.GeraIncerteza):
   ''' Classe que gera a incerteza do problema
       Objetivos: 1) Gerar incerteza
@@ -119,11 +128,10 @@ class GeraIncerteza(tpd.GeraIncerteza):
                 - geracao()
                 - CalcValor(self): 
       Variáveis Obrigatórias:
-                
                  
   '''
 
-  def __init__(self, vEstado, vDecisao,vEstagio,ParInc):
+  def __init__(self,vDecisao,ParInc):
     '''
        Construtor
        \par vEstado - instancia da classe Estado
@@ -150,19 +158,19 @@ class GeraIncerteza(tpd.GeraIncerteza):
 
   def incertezaPrecoMinerio():   
 
-    passos = round(H / dt); 
-    S = zeros([nSimu, passos], dtype = float)
+    passos = round(self.H / self.dt); 
+    S = zeros([self.nSimu, passos], dtype = float)
     x = range(0, int(passos), 1)
     price = []
 
-    for j in range(0, nSimu, 1):
-        S[j, 0] = p_inicial
+    for j in range(0, self.nSimu, 1):
+        S[j, 0] = self.p_inicial
         for i in x[:-1]:
             if S[j, i] < 50:
-                mu /= 2
+                self.mu /= 2
             elif S[j, i] > 150:
-                mu /= 2
-            S[j, i + 1] = S[j, i] * math.exp((mu - 0.5 * math.pow(sigma, 2)) * dt + sigma * math.sqrt(dt) * standard_normal())
+                self.mu /= 2
+            S[j, i + 1] = S[j, i] * math.exp((self.mu - 0.5 * math.pow(self.sigma, 2)) * self.dt + self.sigma * math.sqrt(self.dt) * standard_normal())
 
     for j in range(0, len(S[0]), 1):
         somatorio = 0
@@ -177,10 +185,15 @@ class GeraIncerteza(tpd.GeraIncerteza):
     # ylabel('Preco da Acao')
     # show()
 
-  def incertezasVizinhos(self, Estado):
+  def incertezasVizinhos(self, vEstado, vDecisao):
     #arquivo = open ('/Users/matheusteixeira/Google Drive/UFOP/8º Periodo/Programacao Dinamica/estruturaprecedencia.txt', 'w')
 
+	for r in vDecisao.removidos:
+		vEstado.removeBlock(r)
+
     expected = []
+    dataB = vEstado.B
+    dataP = vEstado.precedence
 
     for line in range(0, len(dataB)):
         expected.append([])
@@ -203,42 +216,30 @@ class GeraIncerteza(tpd.GeraIncerteza):
         # print("bloco {}: {}".format(line, normaldistribution[line]))
 
     for line in range(0, len(dataP)):
-        for collumn in range(0, len(dataP)):
-            if (int(dataP[line][1]) == 0):
-                normaldistribution[line] = int(dataB[line][9])
+        if (int(dataP[line][1]) == 0):
+            normaldistribution[line] = int(dataB[line][9])
 
     return normaldistribution
 
 
-  def geracao(self, Estado):
+  def geracao(self, vEstado, vDecisao):
 
     '''
        Metodo que gera incerteza propriamente dita
        DEVE SER SOBRESCRITO
 
     '''
-    self.concentracao = incertezasVizinhos()
-    self.preco = incertezaPrecoMinerio()
+
+    self.concentracao = incertezasVizinhos(self, vEstado, vDecisao)
+    self.preco = incertezaPrecoMinerio(self, vEstado.estagio)
+
     # print(vizinhos,preco,tons)
 
     # print(vizinhos)
 
-    self.beneficiototal = [0 for i in range(len(tons))]
 
-    for i in range(len(tons)):
-        self.beneficiototal[i] = float(format(self.concentracao[i]*self.preco*float(Estado.B[]), '.2f'))
-
-    # print(preco)
-    print(self.beneficiototal)
-
-    # return self.beneficiototal
-
-  def CalcValor(self):
-    '''
-       Calcula Valor dos custos apos a realizacao da incerteza
-       DEVE SER SOBRESCRITO
-    '''
-    return ret 
+    #return self.beneficiototal
+ 
 class EstadoOPM(tpd.Estado):
   #criar as variáveis de estado
   #criar o construtor
@@ -263,8 +264,27 @@ class EstadoOPM(tpd.Estado):
     self.precedence = ParEst[1] 
     self.neighbors = ParEst[2]     
     self.p = ParEst[3]
+    self.Bjunior = range(len(self.B))
+    self.beneficiototal = [0 for i in range(len(self.Bjunior))]
 
     return 0
+
+  def CalcValor(self,vDecisao,vIncerteza):
+    '''
+       Calcula Valor dos custos apos a realizacao da incerteza
+       DEVE SER SOBRESCRITO
+    '''
+
+
+  def removeBlock(self,idb):
+  	sucessores = [i for i in self.neighbors[idb] if i not in self.precedence[idb]]
+  	for s in sucessores:
+  		a = self.precedence[s][0:2]
+  		b = self.precedence[s][2:]
+  		b.remove(idb)
+  		a[1] = a[1] -1
+  		self.precedence[s] = a+b
+  	self.Bjunior = 	self.Bjunior.remove(idb)
 
   def imprime(self):
     '''
@@ -287,7 +307,9 @@ class EstadoOPM(tpd.Estado):
     Incerteza.geracao()
     # Passagem de estagio
     self.estagio = self.estagio+1
-    ValorAfterUpdate = self.Atualizar(Incerteza)
+    self.Atualizar(Incerteza)
+    ValorAfterUpdate = CalcValor(self,Dec,Incerteza)
+    
     return ValorAfterUpdate
 
 
@@ -297,7 +319,16 @@ class EstadoOPM(tpd.Estado):
        \par Incerteza - Instancia da classe incerteza apos a geracao
        \return ValorAfterUpdate
        DEVE SER SOBRESCRITO
+
+
     '''  
-    self.beneficiototal = beneficiototal
+
+    for i in range(len(beneficiototal)):
+    	idb = vEstado.Bjunior[i]
+        self.beneficiototal[i] = float(format(Incerteza.concentracao[i]*Incerteza.preco*float(vEstado.B[idb][6]), '.2f'))
+
+    # print(preco)
+    print(self.beneficiototal)
+
     return 0
 
