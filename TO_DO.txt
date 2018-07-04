@@ -9,3 +9,4 @@ to do:
 -> continuar testando os métodos
 -> criar classe decisão;
 -> separar entrada de dados
+-> testando a função de merge
