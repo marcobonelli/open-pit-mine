@@ -1,11 +1,24 @@
 Arquivos para fazer o commit no git hub. 
 
-Classe problema ok;
-classe Estado ok;
+TESTES DE CLASSES:
 
-to do:
+Classe ProblemaOPM  -- ok
+Classe EstadoOPM -- ok 
 
--> passar arquivo upit no método cria bloco e limpar os blocos antes de gerar o problema 
--> continuar testando os métodos
--> criar classe decisão;
--> separar entrada de dados [bonelli]
+Class GeraIncerteza -- a testar 
+
+
+
+TO DO:
+
+Bonelli:
+-> passar arquivo upit no método cria bloco e limpar os blocos antes de gerar o problema
+-> separar entrada de dados
+
+Matheus:
+-> Na classe PoliticaOPM criar método de agregação e método solver;
+
+Thiago: 
+-> Testar GeraIncerteza
+-> Criar Classe Decisão
+
