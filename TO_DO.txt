@@ -8,8 +8,4 @@ to do:
 -> passar arquivo upit no método cria bloco e limpar os blocos antes de gerar o problema 
 -> continuar testando os métodos
 -> criar classe decisão;
--> separar entrada de dados
-TESTE
--> testando a função de merge
-TESTE 2
-TESTE 3
+-> separar entrada de dados [bonelli]
