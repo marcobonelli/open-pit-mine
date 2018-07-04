@@ -338,4 +338,61 @@ class EstadoOPM(tpd.Estado):
     print(self.beneficiototal)
 
     return 0
+class PoliticaOPM(tpd.Politica):
+    ''' Classe que representa uma politica apra a solucao do problema
+        Objetivos: 1) Resolver o subproblema
+                   2) Realizar o trainamento se necessário
+        Métodos Obrigatórios: 
+                  - solver() 
+        Variáveis Obrigatórias:
+                   
+    '''    
+	def __init__(self, ParPol):
+    '''
+       Construtor
+       \par ParPol - lista com parâmetros para a politica
+  
+       DEVE SER SOBRESCRITO
+    '''  
+        
+	def Agrega(self,linesB,linesP):
+		'''
+			Método de agregação de blocos "ADAPTADO DE RAMAZAN"
+			\par linesB - conjunto de blocos
+			\par linesP - conjunto de blocos
+			\return conjunto de blocos agregados	    
+		''' 
+		return 0
+	def solver(self,estX):
+		'''
+			Método de solução do sub problema, modelo adaptado de Jelvez et al.
+			\par estX - Estado
+            \return objeto da classe decisão
+		'''
+		return 0
+
+class DecisaoOPM(tpd.Decisao):
+    ''' Classe que organiza a decisão tomada pela politica
+        Objetivos: 1) padronizar o formato da decisao
+        Métodos Obrigatórios: 
+                  - def imprime()
+        Variáveis Obrigatórias:
+                   
+    '''
+
+    def __init__(self, ParDec):
+    '''
+       Construtor
+       \par ParDec - Lista de parametros resultantes do metodo de solucao
+       DEVE SER SOBRESCRITO
+    '''  
+    return 0 
+    def imprime(self):
+    '''
+       Metodo que imprime as informacoes da decisao
+       DEVE SER SOBRESCRITO
+
+    '''
+    return 0 
+
 
