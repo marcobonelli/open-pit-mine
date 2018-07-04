@@ -9,6 +9,7 @@ from numpy.random import standard_normal, normal
 from numpy import array, zeros, sqrt, shape
 from pylab import *
 from leitorXML import *
+from gurobipy import *
 
 class ProblemaOPM(tpd.Problema):
   # criar a classe problema
@@ -30,8 +31,8 @@ class ProblemaOPM(tpd.Problema):
        DEVE SER SOBRESCRITO 
 
     '''
-    Leitura(InstPar.InstArq)  
-    return 0
+    self.Leitura(InstPar.InstArq)  
+    #return 0
 
   def Leitura(self, ArqEntrada):
     '''
@@ -39,11 +40,11 @@ class ProblemaOPM(tpd.Problema):
         \par ArqEntrada  - Nome do arquivo de entrada
         DEVE SER SOBRESCRITO
     '''
-    Instancia = LerXML(args.InstArq)
+    Instancia = LerXML(ArqEntrada)
     dadosIn =  Instancia["Incerteza"]
     dadosMin = Instancia["Mina"]
     dadosSim = Instancia["Simulador"]
-    [self.B,self.P,self.N] = CriaBloco(dadosMin['Arqblocos'],dadosMin['Arqprec'],dadosMin['Arqupit']) 
+    [self.B,self.P,self.N] = self.CriaBloco(dadosMin['Arqblocos'],dadosMin['Arqprec'],dadosMin['Arqupit']) 
     self.p0 = dadosIn['p0']
     self.precomedio = dadosIn['precomedio']
     self.desviopreco = dadosIn['desviopreco']
@@ -118,7 +119,7 @@ class ProblemaOPM(tpd.Problema):
   def CriaEstado(self):
 
   	vEstado = EstadoOPM([self.B,self.P,self.N,self.p0])
-
+        vEstado.imprime()
   	return vEstado
 
 class GeraIncerteza(tpd.GeraIncerteza):
@@ -154,7 +155,7 @@ class GeraIncerteza(tpd.GeraIncerteza):
     self.sigma = ParInc[3]     
     self.mu = ParInc[4]     
     self.nSimu = 100  
-    return 0
+    
 
   def incertezaPrecoMinerio():   
 
@@ -188,8 +189,8 @@ class GeraIncerteza(tpd.GeraIncerteza):
   def incertezasVizinhos(self, vEstado, vDecisao):
     #arquivo = open ('/Users/matheusteixeira/Google Drive/UFOP/8º Periodo/Programacao Dinamica/estruturaprecedencia.txt', 'w')
 
-	for r in vDecisao.removidos:
-		vEstado.removeBlock(r)
+    for r in vDecisao.removidos:
+        vEstado.removeBlock(r)
 
     expected = []
     dataB = vEstado.B
@@ -267,7 +268,7 @@ class EstadoOPM(tpd.Estado):
     self.Bjunior = range(len(self.B))
     self.beneficiototal = [0 for i in range(len(self.Bjunior))]
 
-    return 0
+   
 
   def CalcValor(self,vDecisao,vIncerteza):
     '''
@@ -292,7 +293,13 @@ class EstadoOPM(tpd.Estado):
        DEVE SER SOBRESCRITO
 
     '''
-    return 0
+    print "blocos: ", self.B, "\n" 
+    print "precedentes: ", self.precedence , "\n"
+    print "vizinhos: ", self.neighbors  , "\n"   
+    print "preço inicial: ", self.p, "\n" 
+    print "Bonelli Júnior: ",self.Bjunior , "\n"
+    print "Benefício Total: ",self.beneficiototal, "\n"
+    
 
   def transicao(self,Dec,ParInc):
 
