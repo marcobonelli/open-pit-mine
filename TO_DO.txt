@@ -13,7 +13,7 @@ TO DO:
 
 Bonelli:
 -> passar arquivo upit no método cria bloco e limpar os blocos antes de gerar o problema
--> separar entrada de dados
+-> separar entrada de dados ||| OK |||
 
 Matheus:
 -> Na classe PoliticaOPM criar método de agregação e método solver;
