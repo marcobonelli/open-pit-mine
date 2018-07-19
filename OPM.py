@@ -318,14 +318,88 @@ class PoliticaOPM(tpd.Politica):
 			\par linesP - conjunto de blocos
 			\return conjunto de blocos agregados	    
 		''' 
-		return 0
+    E = float(0.0001) 
+
+    model = Model("Fundamental_Tree_Algorithm")
+
+    f = model.addVars(posI, negI, vtype = GRB.CONTINUOUS, name = 'f')
+
+    model.setObjective(quicksum(C[i] * f[i, j] for i in posI for j in NegP[i]), GRB.MINIMIZE)
+
+    model.update()
+
+    model.addConstrs((quicksum(f[i, j] for i in PosN[j]) == -V[j] + E for j in negI), name = 'negativo')
+    model.addConstrs((quicksum(f[i, j] for j in NegP[i]) <= V[i] for i in posI), name = 'positivo')
+
+    model.write('ramazan.lp') 
+    model.write('ramazan.mps') 
+
+    model.optimize()
+
+    blocosagregados = []
+
+    for i in posI:
+      blocosagregados.append([])
+      for j in NegP[i]:
+        blocosagregados[i].append(j)
+        print("bloco {} agregado ao bloco {}".format(i, j))
+
+		return blocosagregados
+
     def solver(self,estX):
 		'''
 			Método de solução do sub problema, modelo adaptado de Jelvez et al.
 			\par estX - Estado
             \return objeto da classe decisão
 		'''
-		return 0
+
+    K = [0]
+
+    p = 0.15
+
+    cLowerBound = [[] for i in range(len(K))]
+    cLowerBound[0] = 5
+
+    cUpperBound = [[] for i in range(len(K))]
+    cUpperBound[0] = 10
+
+    model = Model("Open_Pit_Mine_Production_Scheduling")
+
+    x = model.addVars(allB, vtype = GRB.BINARY, name = 'x')
+    y = model.addVars(R, vtype = GRB.BINARY, name = 'y')
+    M = model.addVars(R, vtype = GRB.BINARY, name = 'M')
+
+    model.update()
+
+    model.setObjective(quicksum(p * v[i] * x[i] for i in allB), GRB.MAXIMIZE)
+
+    model.addConstrs((x[i] <= y[r] for r in R for i in B[r]), name = 'R2')
+    model.addConstrs((x[i] <= x[j] for i in allB for j in A[i] if len(A[i]) != 0), name = 'R3')
+    model.addConstrs((quicksum(x[i] for i in allB) >= cLowerBound[k] for k in K), name = 'R4') # falta adicionar o peso [a] do processo
+    model.addConstrs((quicksum(x[i] for i in allB) <= cUpperBound[k] for k in K), name = 'R5') # falta adicionar o peso [a] do processo
+    model.addConstr((quicksum(y[r1] for r1 in R) <= 1 + quicksum(M[r2] for r2 in R)), name = 'R6')
+    model.addConstrs((M[r] <= quicksum(x[i] for i in B[r]) / len(B[r]) for r in R), name = 'R7')
+
+    model.write('jelvez.lp') 
+    model.write('jelvez.mps') 
+
+    model.optimize()
+
+    for i in allB:
+        if x[i].x == 1:
+            print("o bloco {} foi extraído".format(i))
+        else:
+            print("o bloco {} não foi extraído".format(i))
+
+    print("")
+
+    for r in R:
+        if y[r] .x == 1:
+            print("o bloco agregado {} foi explorado".format(r))
+        else:
+            print("o bloco agregado {} não foi explorado".format(r))
+
+		return y,x
 
 class DecisaoOPM(tpd.Decisao):
     ''' Classe que organiza a decisão tomada pela politica

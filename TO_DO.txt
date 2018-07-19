@@ -21,6 +21,7 @@ Matheus:
 Thiago: 
 -> Testar GeraIncerteza
 -> Criar Classe Decisão
+-> Implementar campo aleatório de Markov para vizinhança dos blocos
 
 
 FUNÇÕES QUE FALTAM:
