@@ -22,3 +22,21 @@ Thiago:
 -> Testar GeraIncerteza
 -> Criar Classe Decisão
 
+
+FUNÇÕES QUE FALTAM:
+
+class ProblemaOPM(tpd.Problema):
+	def ImprimeResultados(self):
+	def SalvaResultados(self, ArqSaida):
+
+class EstadoOPM(tpd.Estado):
+	def CalcValor(self, vDecisao, vIncerteza):
+
+class PoliticaOPM(tpd.Politica):
+	def __init__(self, ParPol):
+	def Agrega(self,linesB,linesP):
+	def solver(self,estX):
+
+class DecisaoOPM(tpd.Decisao):
+	def __init__(self, ParDec):
+	def imprime(self):
