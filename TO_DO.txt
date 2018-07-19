@@ -4,23 +4,10 @@ TESTES DE CLASSES:
 
 Classe ProblemaOPM  -- ok
 Classe EstadoOPM -- ok 
+Class GeraIncerteza -- ok
+Class PoliticaOPM --
+Class DecisaoOPM --
 
-Class GeraIncerteza -- a testar 
-
-
-
-TO DO:
-
-Bonelli:
--> passar arquivo upit no método cria bloco e limpar os blocos antes de gerar o problema
--> separar entrada de dados ||| OK |||
-
-Matheus:
--> Na classe PoliticaOPM criar método de agregação e método solver;
-
-Thiago: 
--> Testar GeraIncerteza
--> Criar Classe Decisão
 
 
 FUNÇÕES QUE FALTAM:
@@ -40,3 +27,15 @@ class PoliticaOPM(tpd.Politica):
 class DecisaoOPM(tpd.Decisao):
 	def __init__(self, ParDec):
 	def imprime(self):
+	
+Tarefas:
+1) Bonelli:
+	a - Passar para o papel e colocar no drive o método de agregação
+	b - Implementar o método proposto 
+2) Matheus: 
+	a - Implementar método simplificado na função Agrega
+	b - Implementar Função Solver com base no gurobipy
+3) Thiago:
+	a - Separar e ler artigos de Simulação condicional para OPM
+	b - Implementar método de simulação na função de simulaçõ de vizinhos
+	c - Testar Global
