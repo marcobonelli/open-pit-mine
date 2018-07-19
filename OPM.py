@@ -129,32 +129,16 @@ class GeraIncerteza(tpd.GeraIncerteza):
 
   def incertezaPrecoMinerio():   
 
-    passos = round(self.H / self.dt); 
-    S = zeros([self.nSimu, passos], dtype = float)
-    x = range(0, int(passos), 1)
-    price = []
+    N = round(self.H / self.dt); 
+    t = numpy.linspace(0, T, N)
+    W = standard_normal(size = N)
+    W = numpy.cumsum(W)*numpy.sqrt(dt) ### standard brownian motion ###
+    X = (self.mu-0.5*self.sigma**2)*t + self.sigma*W 
+    S = self.p_inicial*numpy.exp(X) ### geometric brownian motion ###
+    #plot(t, S)
+    #show()
 
-    for j in range(0, self.nSimu, 1):
-        S[j, 0] = self.p_inicial
-        for i in x[:-1]:
-            if S[j, i] < 50:
-                self.mu /= 2
-            elif S[j, i] > 150:
-                self.mu /= 2
-            S[j, i + 1] = S[j, i] * math.exp((self.mu - 0.5 * math.pow(self.sigma, 2)) * self.dt + self.sigma * math.sqrt(self.dt) * standard_normal())
-
-    for j in range(0, len(S[0]), 1):
-        somatorio = 0
-        for i in range(0, len(S), 1):
-            somatorio += S[i][j]
-        price.append(somatorio / len(S))
-    # print(price[1])
-    return price[1]    
-    # plot(x, price)
-    # title('Simulacao com %d dias e Preco Inicial de %.2f' % (int(passos), p_inicial))
-    # xlabel('Dias')
-    # ylabel('Preco da Acao')
-    # show()
+    return S[1]    
 
   def incertezasVizinhos(self, vEstado, vDecisao):
     #arquivo = open ('/Users/matheusteixeira/Google Drive/UFOP/8º Periodo/Programacao Dinamica/estruturaprecedencia.txt', 'w')
@@ -163,8 +147,9 @@ class GeraIncerteza(tpd.GeraIncerteza):
         vEstado.removeBlock(r)
 
     expected = []
-    dataB = vEstado.B
+    dataB = vEstado.B # copy?
     dataP = vEstado.precedence
+    neighbors = vEstado.N
 
     for line in range(0, len(dataB)):
         expected.append([])
@@ -354,9 +339,12 @@ class DecisaoOPM(tpd.Decisao):
     def __init__(self, ParDec):
     '''
        Construtor
-       \par ParDec - Lista de parametros resultantes do metodo de solucao
+       @par ParDec - Lista de parametros resultantes do metodo de solucao
+       @par ParDec[0] - Lista de Ids dos blocos removidos
+
        DEVE SER SOBRESCRITO
     '''  
+        self.removidos = ParDec[0]
     return 0 
     def imprime(self):
     '''
