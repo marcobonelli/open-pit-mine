@@ -1,4 +1,5 @@
 #coding: utf-8
+
 import TemplatePD as tpd
 import sys
 import math
@@ -10,6 +11,8 @@ from numpy import array, zeros, sqrt, shape
 from pylab import *
 from leitorXML import *
 from gurobipy import *
+
+import leitor_instancia as instancia
 
 class ProblemaOPM(tpd.Problema):
   # criar a classe problema
@@ -44,7 +47,7 @@ class ProblemaOPM(tpd.Problema):
     dadosIn =  Instancia["Incerteza"]
     dadosMin = Instancia["Mina"]
     dadosSim = Instancia["Simulador"]
-    [self.B,self.P,self.N] = self.CriaBloco(dadosMin['Arqblocos'],dadosMin['Arqprec'],dadosMin['Arqupit']) 
+    [self.B, self.P, self.N] = self.CriaBloco(dadosMin['Arqblocos'], dadosMin['Arqprec'], dadosMin['Arqupit']) 
     self.p0 = dadosIn['p0']
     self.precomedio = dadosIn['precomedio']
     self.desviopreco = dadosIn['desviopreco']
@@ -53,53 +56,20 @@ class ProblemaOPM(tpd.Problema):
     return 0
 
   def CriaBloco(self, ArqBloco, ArqPrecedncia, ArqUpit):
-    # Fazer leitura do ArqUpit
 
-    linesP = [line.rstrip('\n') for line in open('r_instance.prec')]
-    linesB = [line.rstrip('\n') for line in open('r_instance.blocks')]
+    print('leitura das informacoes sobre blocos iniciada:')
+    blocos = instancia.gerar_blocos_upit()
+    print('\t--> concluido.\n')
 
-    dataP = []
-    dataB = []
+    print('leitura das precedencias dos blocos iniciada:')
+    precedentes = instancia.gerar_precedentes_upit()
+    print('\t--> concluido.\n')
 
-    for line in range(0, len(linesP)):
-        dataP.append(linesP[line].split(' '))
-        dataB.append(linesB[line].split(' '))
-        print(dataB[line])
-
-    for line in range(0, len(dataP)):
-        for collumn in range(0, len(dataP[line])):
-            dataP[line][collumn] = int(dataP[line][collumn])
-
-    neighbors = []
-
-    for line in range(0, len(dataP)):
-        neighbors.append([])
-        neighbors[line].append(line)
-        
-        for collumn in range(2, len(dataP[line])):
-            neighbors[line].append(dataP[line][collumn])
-            
-        for lineN in range(0, len(dataP)):
-            for collumn in range(2, len(dataP[lineN])):
-                if dataP[lineN][collumn] == line:
-                    neighbors[line].append(dataP[lineN][0])
-
-    for line in range(0, len(dataB)):
-        for collumn in range(0, 4):
-            dataB[line][collumn] = int(dataB[line][collumn])
-
-        for collumn in range(5, 10):
-            dataB[line][collumn] = float(dataB[line][collumn])
-
-        dataB[line][10] = int(dataB[line][10])
-
-    tons = [0 for i in range(len(dataB))]
-
-    for line in range(0, len(dataB)):
-        for collumn in range(0, len(dataB)):
-            tons[collumn] = dataB[line][6] 
-
-    return [dataB,dataP,neighbors]
+    print('leitura das vizinhancas dos blocos iniciada:')
+    vizinhos = instancia.gerar_vizinhos_upit()
+    print('\t--> concluido.\n')
+	
+    return [blocos, precedentes, vizinhos]
 
   def ImprimeResultados(self):
     '''
@@ -338,6 +308,7 @@ class EstadoOPM(tpd.Estado):
     print(self.beneficiototal)
 
     return 0
+
 class PoliticaOPM(tpd.Politica):
     ''' Classe que representa uma politica apra a solucao do problema
         Objetivos: 1) Resolver o subproblema
@@ -347,7 +318,7 @@ class PoliticaOPM(tpd.Politica):
         Variáveis Obrigatórias:
                    
     '''    
-	def __init__(self, ParPol):
+    def __init__(self, ParPol):
     '''
        Construtor
        \par ParPol - lista com parâmetros para a politica
@@ -355,7 +326,7 @@ class PoliticaOPM(tpd.Politica):
        DEVE SER SOBRESCRITO
     '''  
         
-	def Agrega(self,linesB,linesP):
+    def Agrega(self,linesB,linesP):
 		'''
 			Método de agregação de blocos "ADAPTADO DE RAMAZAN"
 			\par linesB - conjunto de blocos
@@ -363,7 +334,7 @@ class PoliticaOPM(tpd.Politica):
 			\return conjunto de blocos agregados	    
 		''' 
 		return 0
-	def solver(self,estX):
+    def solver(self,estX):
 		'''
 			Método de solução do sub problema, modelo adaptado de Jelvez et al.
 			\par estX - Estado
