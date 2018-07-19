@@ -35,7 +35,7 @@ Tarefas:
 2) Matheus: 
 	a - Implementar método simplificado na função Agrega
 	b - Implementar Função Solver com base no gurobipy
+	c - Realizar teste global com o que tem até o memento
 3) Thiago:
 	a - Separar e ler artigos de Simulação condicional para OPM
-	b - Implementar método de simulação na função de simulaçõ de vizinhos
-	c - Testar Global
+	b - Implementar método de simulação na função de simulação de vizinhos
