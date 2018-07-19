@@ -1,6 +1,6 @@
 #coding: utf-8
 
-# realiza a leitura do arquivo de blocos e retorna todos os dados, em formato de lista
+# funcao que realiza a leitura do arquivo de blocos e retorna todos os dados, em formato de lista
 def ler_blocos():
 
 	database = [line.rstrip('\n') for line in open('newman1.blocks')]
@@ -14,7 +14,7 @@ def ler_blocos():
 
 	return database
 
-# realiza a leitura do arquivo contendo o upit e retorna somente os blocos pertencentes ao upit, em formato de lista
+# funcao que realiza a leitura do arquivo contendo o upit e retorna somente os blocos pertencentes ao upit, em formato de lista
 def ler_upit():
 
 	database = [line.rstrip('\n') for line in open('newman1.upit')]
@@ -27,7 +27,7 @@ def ler_upit():
 
 	return upit
 
-# realiza a leitura do arquivo de precedencia de blocos e retorna todos os dados, em formato de lista
+# funcao que realiza a leitura do arquivo de precedencia de blocos e retorna todos os dados, em formato de lista
 def ler_precedencia():
 
 	database = [line.rstrip('\n') for line in open('newman1.prec')]
@@ -39,7 +39,7 @@ def ler_precedencia():
 
 	return database
 
-# retorna todos os dados referentes ao blocos que pertencem ao upit, em formato de lista
+# funcao que retorna todos os dados referentes ao blocos que pertencem ao upit, em formato de lista
 def gerar_blocos_upit():
 
 	blocos = ler_blocos()
@@ -50,3 +50,65 @@ def gerar_blocos_upit():
 		database.append(blocos[i])
 
 	return database
+
+# funcao que retorna todos os dados referentes ao blocos precedentes que pertencem ao upit, em formato de lista
+def gerar_precedentes_upit():
+
+	precedencia = ler_precedencia()
+	upit = ler_upit()
+
+	for k in range(len(precedencia) - len(upit)):
+		for i in range(len(precedencia)):
+			for j in range(2, 2 + precedencia[i][1]):
+				if precedencia[i][j] not in upit:
+					precedencia[i].remove(precedencia[i][j])
+					precedencia[i][1] = precedencia[i][1] - 1
+					break 
+
+	database = []
+	for i in upit:
+		database.append(precedencia[i])
+
+	return database
+
+# funcao que retorna todos os dados referentes aos blocos vizinhos pertencentes ao upit, em formato de lista
+def gerar_vizinhos_upit():
+	
+	blocos = ler_precedencia()
+	upit = ler_upit()
+
+	for i in range(len(blocos)):
+		blocos[i].remove(blocos[i][1])
+
+	for i in range(len(blocos)):
+		for j in range(len(blocos)):
+			if i != j and i in blocos[j]:
+				blocos[i].append(blocos[j][0])
+		blocos[i] = sorted(set(blocos[i]))
+
+	for k in range(len(blocos) - len(upit)):
+		for i in range(len(blocos)):
+			for j in range(len(blocos)):
+				if blocos[i][j] not in upit:
+					blocos[i].remove(blocos[i][j])
+					break 
+
+	database = []
+	for i in upit:
+		database.append(blocos[i])
+	
+	return database
+
+if __name__ == '__main__':
+
+	print('leitura das informacoes sobre blocos iniciada:')
+	blocos = gerar_blocos_upit()
+	print('\t--> concluido.\n')
+
+	print('leitura das precedencias dos blocos iniciada:')
+	precedentes = gerar_precedentes_upit()
+	print('\t--> concluido.\n')
+
+	print('leitura das vizinhancas dos blocos iniciada:')
+	vizinhos = gerar_vizinhos_upit()
+	print('\t--> concluido.\n')
