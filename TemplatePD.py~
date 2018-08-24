@@ -78,7 +78,7 @@ class Gerador:
 		return 0
 
 # Classe Estado
-class Estado:
+class Estado
 	''' Classe que representa o estado do sistema
 		Objetivos: 1) Armazenar as variáveis de estado
 				   2) Realizar transicao

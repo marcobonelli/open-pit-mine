@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OPMS_instance>
+   <Incerteza>
+      <p0>120.35</p0>
+      <precomedio> 6.38</precomedio>
+      <desviopreco> 3.49</desviopreco>
+      <H>1</H>
+      <dt>0.01</dt>
+   </Incerteza>  
+   <Simulador>
+      <replicacoes>100</replicacoes>
+   </Simulador> 
+   <Mina>
+      <Arqblocos>"r_instance.blocks"</Arqblocos>
+      <Arqprec>"r_instance.prec"</Arqprec>
+      <Arqupit> "r_instance.txt"</Arqupit>
+   </Mina> 
+</OPMS_instance>

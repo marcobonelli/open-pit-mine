@@ -1,0 +1,11 @@
+Arquivos para fazer o commit no git hub. 
+
+Classe problema ok;
+classe Estado ok;
+
+to do:
+
+-> passar arquivo upit no método cria bloco e limpar os blocos antes de gerar o problema 
+-> continuar testando os métodos
+-> criar classe decisão;
+-> separar entrada de dados [bonelli]

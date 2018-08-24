@@ -7,7 +7,7 @@
 <xs:sequence>
 <xs:element ref="Incerteza"/>
 <xs:element ref="Simulador"/>
-<xs:element ref="Mina"/>
+<xs:element ref="Mina">
 </xs:sequence>
 </xs:complexType>
 </xs:element>

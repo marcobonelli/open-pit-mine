@@ -371,12 +371,12 @@ class DecisaoOPM(tpd.Decisao):
 			DEVE SER SOBRESCRITO
 		'''  
 		self.removidos = ParDec[0]
-		return 0 
+	return 0 
     def imprime(self):
 		'''
 			Metodo que imprime as informacoes da decisao
 			DEVE SER SOBRESCRITO
 		'''
-		return 0 
+	return 0 
 
 
