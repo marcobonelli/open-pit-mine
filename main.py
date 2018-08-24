@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser(description='OPMS_instance')
 parser.add_argument('InstArq', help='Arquivo com os parâmetros da instância')
 args = parser.parse_args()
 
-P= ProblemaOPM(args);
+P = ProblemaOPM(args);
 print P.B
 print P.P
 print P.N
