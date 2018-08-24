@@ -58,15 +58,15 @@ class ProblemaOPM(tpd.Problema):
   def CriaBloco(self, ArqBloco, ArqPrecedncia, ArqUpit):
 
 	print('leitura das informacoes sobre blocos iniciada:')
-	blocos = instancia.gerar_blocos_upit()
+	blocos = instancia.gerar_blocos_upit( ArqBloco,ArqUpit)
 	print('\t--> concluido.\n')
 
 	print('leitura das precedencias dos blocos iniciada:')
-	precedentes = instancia.gerar_precedentes_upit()
+	precedentes = instancia.gerar_precedentes_upit(ArqPrecedncia,ArqUpit)
 	print('\t--> concluido.\n')
 
 	print('leitura das vizinhancas dos blocos iniciada:')
-	vizinhos = instancia.gerar_vizinhos_upit()
+	vizinhos = instancia.gerar_vizinhos_upit(ArqPrecedncia,ArqUpit)
 	print('\t--> concluido.\n')
 	
 	return [blocos, precedentes, vizinhos]

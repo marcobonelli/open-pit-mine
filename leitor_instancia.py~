@@ -72,10 +72,10 @@ def gerar_precedentes_upit(ArqPrecedncia,ArqUpit):
 	return database
 
 # funcao que retorna todos os dados referentes aos blocos vizinhos pertencentes ao upit, em formato de lista
-def gerar_vizinhos_upit(ArqPrecedncia,ArqUpit):
+def gerar_vizinhos_upit(ArqPrecedncia):
 	
 	blocos = ler_precedencia(ArqPrecedncia)
-	upit = ler_upit(ArqUpit)
+	upit = ler_upit()
 
 	for i in range(len(blocos)):
 		blocos[i].remove(blocos[i][1])
