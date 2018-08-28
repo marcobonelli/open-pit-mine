@@ -11,8 +11,8 @@
       <replicacoes>100</replicacoes>
    </Simulador> 
    <Mina>
-      <Arqblocos>r_instance.blocks</Arqblocos>
-      <Arqprec>r_instance.prec</Arqprec>
-      <Arqupit>r_instance.txt</Arqupit>
+      <Arqblocos>newman1.blocks</Arqblocos>
+      <Arqprec>newman1.prec</Arqprec>
+      <Arqupit>newman1.upit</Arqupit>
    </Mina> 
 </OPMS_instance>

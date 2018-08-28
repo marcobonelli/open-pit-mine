@@ -1,3 +1,5 @@
+import xml.etree.ElementTree as ET
+
 #coding: utf-8
 
 # funcao que realiza a leitura do arquivo de blocos e retorna todos os dados, em formato de lista
@@ -18,7 +20,7 @@ def ler_blocos(ArqBloco):
 def ler_upit(ArqUpit):
 
 	database = [line.rstrip('\n') for line in open(ArqUpit.encode('utf-8'))]
-	
+
 	upit = []
 	for i in range(len(database)):
 		database[i] = database[i].split(' ')
@@ -52,7 +54,7 @@ def gerar_blocos_upit(ArqBloco, ArqUpit):
 	return database
 
 # funcao que retorna todos os dados referentes ao blocos precedentes que pertencem ao upit, em formato de lista
-def gerar_precedentes_upit(ArqPrecedncia,ArqUpit):
+def gerar_precedentes_upit(ArqPrecedncia, ArqUpit):
 
 	precedencia = ler_precedencia(ArqPrecedncia)
 	upit = ler_upit(ArqUpit)
@@ -72,7 +74,7 @@ def gerar_precedentes_upit(ArqPrecedncia,ArqUpit):
 	return database
 
 # funcao que retorna todos os dados referentes aos blocos vizinhos pertencentes ao upit, em formato de lista
-def gerar_vizinhos_upit(ArqPrecedncia,ArqUpit):
+def gerar_vizinhos_upit(ArqPrecedncia, ArqUpit):
 	
 	blocos = ler_precedencia(ArqPrecedncia)
 	upit = ler_upit(ArqUpit)
@@ -100,16 +102,21 @@ def gerar_vizinhos_upit(ArqPrecedncia,ArqUpit):
 	return database
 
 '''if __name__ == '__main__':
+	
+	tree = ET.parse('i0.xml')  
+	root = tree.getroot()
+
+	print([root[2][i].text for i in [0, 1, 2]])
 
 	print('leitura das informacoes sobre blocos iniciada:')
-	blocos = gerar_blocos_upit()
+	blocos = gerar_blocos_upit(root[2][0].text, root[2][2].text)
 	print('\t--> concluido.\n')
 
 	print('leitura das precedencias dos blocos iniciada:')
-	precedentes = gerar_precedentes_upit()
+	precedentes = gerar_precedentes_upit(root[2][1].text, root[2][2].text)
 	print('\t--> concluido.\n')
 
 	print('leitura das vizinhancas dos blocos iniciada:')
-	vizinhos = gerar_vizinhos_upit()
+	vizinhos = gerar_vizinhos_upit(root[2][1].text, root[2][2].text)
 	print('\t--> concluido.\n')
 '''
