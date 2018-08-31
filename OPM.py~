@@ -58,15 +58,15 @@ class ProblemaOPM(tpd.Problema):
   def CriaBloco(self, ArqBloco, ArqPrecedncia, ArqUpit):
 
 	print('leitura das informacoes sobre blocos iniciada:')
-	blocos = instancia.gerar_blocos_upit( ArqBloco,ArqUpit)
+	blocos = instancia.gerar_blocos_upit(ArqBloco, ArqUpit)
 	print('\t--> concluido.\n')
 
 	print('leitura das precedencias dos blocos iniciada:')
-	precedentes = instancia.gerar_precedentes_upit(ArqPrecedncia,ArqUpit)
+	precedentes = instancia.gerar_precedentes_upit(ArqPrecedncia, ArqUpit)
 	print('\t--> concluido.\n')
 
 	print('leitura das vizinhancas dos blocos iniciada:')
-	vizinhos = instancia.gerar_vizinhos_upit(ArqPrecedncia)
+	vizinhos = instancia.gerar_vizinhos_upit(ArqPrecedncia, ArqUpit)
 	print('\t--> concluido.\n')
 	
 	return [blocos, precedentes, vizinhos]
@@ -102,18 +102,15 @@ class GeraIncerteza(tpd.GeraIncerteza):
 				 
   '''
 
-  def __init__(self,vDecisao,ParInc):
+  def __init__(self,ParInc):
 	'''
 	   Construtor
-	   \par vEstado - instancia da classe Estado
-	   \par vDecisao - instancia da classe Decisao
-	   \par vEstagio - inteiro com a informação do estagio atual
 	   \par ParInc - lista com parâmetros para realizacao da incerteza
-	   ParInc[0] = p_inicial
-	   ParInc[1] = H
-	   ParInc[2] = dt
-	   ParInc[3] = sigma
-	   ParInc[4] = mu
+	   \par ParInc[0] = p_inicial
+	   \par ParInc[1] = H -> Horizonte de geração
+	   \par ParInc[2] = dt -> discretização
+	   \par ParInc[3] = sigma -> variação do browniano padrão
+	   \par ParInc[4] = mu -> tendência do browniano padrão
 	   **ParInc[5] = nSimu
 
 	   DEVE SER SOBRESCRITO
@@ -128,23 +125,22 @@ class GeraIncerteza(tpd.GeraIncerteza):
 	
 
   def incertezaPrecoMinerio():   
-
-	N = round(self.H / self.dt); 
-	t = numpy.linspace(0, T, N)
-	W = standard_normal(size = N)
+	#ULTIMA ALTERAÇÃO : 31/08 - Thiago
+	N = round(self.H / self.dt) +1; # número de passos,
+	t = numpy.linspace(0, H, N) # intervalo discretizado
+	W = standard_normal(size = N) # normal padrão
 	W = numpy.cumsum(W)*numpy.sqrt(dt) ### standard brownian motion ###
-	X = (self.mu-0.5*self.sigma**2)*t + self.sigma*W 
+	X = (self.mu-0.5*self.sigma**2)*t + self.sigma*W  ### brownian motion
 	S = self.p_inicial*numpy.exp(X) ### geometric brownian motion ###
 	#plot(t, S)
 	#show()
 
 	return S[1]    
 
-  def incertezasVizinhos(self, vEstado, vDecisao):
+  def incertezasVizinhos(self, vEstado):
 	#arquivo = open ('/Users/matheusteixeira/Google Drive/UFOP/8º Periodo/Programacao Dinamica/estruturaprecedencia.txt', 'w')
+	#ULTIMA ALTERAÇÃO : 31/08 - Thiago  
 
-	for r in vDecisao.removidos:
-		vEstado.removeBlock(r)
 
 	expected = []
 	dataB = vEstado.B # copy?
@@ -178,16 +174,16 @@ class GeraIncerteza(tpd.GeraIncerteza):
 	return normaldistribution
 
 
-  def geracao(self, vEstado, vDecisao):
+  def geracao(self, vEstado):
 
 	'''
 	   Metodo que gera incerteza propriamente dita
 	   DEVE SER SOBRESCRITO
-
+	   ULTIMA ALTERAÇÃO : 31/08 - Thiago	
 	'''
 
-	self.concentracao = incertezasVizinhos(self, vEstado, vDecisao)
-	self.preco = incertezaPrecoMinerio(self, vEstado.estagio)
+	self.concentracao = incertezasVizinhos(self, vEstado)
+	self.preco = incertezaPrecoMinerio(self)
 
 	# print(vizinhos,preco,tons)
 
@@ -264,8 +260,13 @@ class EstadoOPM(tpd.Estado):
 	   \par ParInc - Lista de parametros para geracao de incerteza
 	   \return ValorAfterUpdate
 	   NAO PODE SER SOBRESCRITO
-	'''  
-	Incerteza = GeraIncerteza(self,Dec,self.estagio,ParInc)
+	   ULTIMA ALTERAÇÃO : 31/08 - Thiago 
+	'''
+	# Post Decision State
+	for r in Dec.removidos:
+		self.removeBlock(r)
+    # incerteza
+	Incerteza = GeraIncerteza(self,ParInc)
 	Incerteza.geracao()
 	# Passagem de estagio
 	self.estagio = self.estagio+1
@@ -282,17 +283,16 @@ class EstadoOPM(tpd.Estado):
 	   \return ValorAfterUpdate
 	   DEVE SER SOBRESCRITO
 
-
+	   ULTIMA ALTERAÇÃO : 31/08 - Thiago
 	'''  
 
-	for i in range(len(beneficiototal)):
-		idb = vEstado.Bjunior[i]
-		self.beneficiototal[i] = float(format(Incerteza.concentracao[i]*Incerteza.preco*float(vEstado.B[idb][6]), '.2f'))
+	for i in range(len(self.beneficiototal)):
+		idb = self.Bjunior[i]
+		self.beneficiototal[i] = float(format(Incerteza.concentracao[i]*Incerteza.preco*float(self.B[idb][6]), '.2f'))
 
 	# print(preco)
-	print(self.beneficiototal)
+	#print(self.beneficiototal)
 
-	return 0
 
 class PoliticaOPM(tpd.Politica):
 	''' Classe que representa uma politica apra a solucao do problema
