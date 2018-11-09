@@ -10,9 +10,3 @@ def LerXML(arq):
     my_dict = xs.to_dict(arq)
     return my_dict
 
-def LerXMLGen(arq):
-    xs = xmlschema.XMLSchema('GeraInstancia.xsd')
-    print xs.is_valid(arq)
-    pprint(xs.to_dict(arq))
-    my_dict = xs.to_dict(arq)
-    return my_dict
