@@ -1,11 +1,45 @@
 Arquivos para fazer o commit no git hub. 
 
-Classe problema ok;
-classe Estado ok;
+TESTES DE CLASSES:
 
-to do:
+Classe ProblemaOPM  -- ok
+Classe EstadoOPM -- ok 
+Class GeraIncerteza -- ok
+Class PoliticaOPM --
+Class DecisaoOPM --
 
--> passar arquivo upit no método cria bloco e limpar os blocos antes de gerar o problema 
--> continuar testando os métodos
--> criar classe decisão;
--> separar entrada de dados [bonelli]
+
+
+FUNÇÕES QUE FALTAM:
+
+class ProblemaOPM(tpd.Problema):
+	def ImprimeResultados(self):
+	def SalvaResultados(self, ArqSaida):
+
+class EstadoOPM(tpd.Estado):
+	def CalcValor(self, vDecisao, vIncerteza):
+
+class PoliticaOPM(tpd.Politica):
+	def __init__(self, ParPol):
+	def Agrega(self,linesB,linesP):
+	def solver(self,estX):
+
+class DecisaoOPM(tpd.Decisao):
+	def __init__(self, ParDec):
+	def imprime(self):
+	
+Tarefas:
+1) Bonelli:
+	a - Passar para o papel e colocar no drive o método de agregação
+	b - Implementar o método proposto 
+2) Matheus: 
+	a - Implementar método simplificado na função Agrega
+	b - Implementar Função Solver com base no gurobipy
+	c - Realizar teste global com o que tem até o memento
+3) Thiago:
+	a - Separar e ler artigos de Simulação condicional para OPM
+	b - Implementar método de simulação na função de simulação de vizinhos
+
+#############################################################################
+No estado deve-se ter uma lista com todos os blocos. Os blocos removidos devem ter o valor 
+

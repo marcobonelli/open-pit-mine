@@ -39,3 +39,11 @@ Tarefas:
 3) Thiago:
 	a - Separar e ler artigos de Simulação condicional para OPM
 	b - Implementar método de simulação na função de simulação de vizinhos
+
+#############################################################################
+
+1) Matheus:
+	*) Criar a classe simulardor
+2) Thiago:
+	*) alterar a função de gerçaõ para entrar a decisão e considerar o valor definitivos dos blocos já extraídos. 
+

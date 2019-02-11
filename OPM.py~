@@ -223,9 +223,15 @@ class EstadoOPM(tpd.Estado):
 
   def CalcValor(self,vDecisao,vIncerteza):
 	'''
-	   Calcula Valor dos custos apos a realizacao da incerteza
+	   Calcula Valor da extração apos a realizacao da incerteza
 	   DEVE SER SOBRESCRITO
 	'''
+	valor = 0.0
+	for r in vDecisao.removidos:
+		idb = self.Bjunior[r]
+		valor += float(format(Incerteza.concentracao[r]*Incerteza.preco*float(self.B[idb][6]), '.2f'))
+	return valor
+
 
 
   def removeBlock(self,idb):
@@ -260,18 +266,18 @@ class EstadoOPM(tpd.Estado):
 	   \par ParInc - Lista de parametros para geracao de incerteza
 	   \return ValorAfterUpdate
 	   NAO PODE SER SOBRESCRITO
-	   ULTIMA ALTERAÇÃO : 31/08 - Thiago 
+	   ULTIMA ALTERAÇÃO : 11/02/2019 - Thiago 
 	'''
-	# Post Decision State
-	for r in Dec.removidos:
-		self.removeBlock(r)
     # incerteza
 	Incerteza = GeraIncerteza(self,ParInc)
-	Incerteza.geracao()
+	Incerteza.geracao() #-> gera valor inclusive para os blocos removidos 
 	# Passagem de estagio
 	self.estagio = self.estagio+1
 	self.Atualizar(Incerteza)
 	ValorAfterUpdate = CalcValor(self,Dec,Incerteza)
+
+	for r in Dec.removidos:
+		self.removeBlock(r)
 	
 	return ValorAfterUpdate
 
